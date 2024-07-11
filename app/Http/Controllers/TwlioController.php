@@ -17,7 +17,10 @@ class TwlioController extends Controller
         //
     }
 
-    //
+    /**
+     * Conversation Api.
+     *
+     */
     public function createConversation()
     {
         // Find your Account SID and Auth Token at twilio.com/console
@@ -79,6 +82,8 @@ class TwlioController extends Controller
 
         print $participant->sid;
     }
+
+    # SMS SEND API
     public function sendAnSms(Request $request)
     {
         $datos = (array)$request->input();
@@ -115,7 +120,8 @@ class TwlioController extends Controller
         $messages = $twilio->messages->read([], 20);
 
         foreach ($messages as $record) {
-            print $record->sid;
+            # print $record->sid;
+            var_dump($record->body);
         }
     }
     public function fetchAMessage()
@@ -126,8 +132,73 @@ class TwlioController extends Controller
         $token = getenv("TWILIO_AUTH_TOKEN");
         $twilio = new Client($sid, $token);
 
-        $message = $twilio->messages("SMf1845bf9be30fcbe53823a1ff4639e9a")->fetch();
+        $message = $twilio->messages("SM6d827718023d827af3aef518d4a30fd8")->fetch();
 
         print $message->to;
+    }
+    public function listMessageResourcesMatchingFilterCriteria(Request $request)
+    {
+        $datos = (array)$request->input();
+        $to_number = $datos['to_number'];
+        $dateSent = $datos['dateSent'];
+
+        $sid = getenv("TWILIO_ACCOUNT_SID");
+        $token = getenv("TWILIO_AUTH_TOKEN");
+        $twilio = new Client($sid, $token);
+
+        // Query parameters To string<phone-number>, From string<phone-number> DateSent string<date-time>,PageSize integer,Page integer
+        $messages = $twilio->messages->read(
+            [
+                "to" => "+51" . $to_number,
+                "from" => getenv("TWILIO_MY_NUMBER"),
+                //"dateSent" => new \DateTime("2024-07-11T00:00:00Z"),
+                "dateSent" => new \DateTime($dateSent . "T00:00:00Z")
+            ],
+            20
+        );
+
+        foreach ($messages as $record) {
+            var_dump($record->body);
+        }
+    }
+    public function listMessagesThatWereSentBeforeSpecificDate(Request $request)
+    {
+        $datos = (array)$request->input();
+        $dateSentBefore = $datos['dateSentBefore'];
+
+        $sid = getenv("TWILIO_ACCOUNT_SID");
+        $token = getenv("TWILIO_AUTH_TOKEN");
+        $twilio = new Client($sid, $token);
+
+        $messages = $twilio->messages->read(
+            ["dateSentBefore" => new \DateTime($dateSentBefore . "T00:00:00Z")],
+            20
+        );
+
+        foreach ($messages as $record) {
+            var_dump($record->body);
+        }
+    }
+    public function listMessagesWithinSpecificTimePeriod(Request $request)
+    {
+        $datos = (array)$request->input();
+        $dateSentBefore = $datos['dateSentBefore'];
+        $dateSentAfter = $datos['dateSentAfter'];
+
+        $sid = getenv("TWILIO_ACCOUNT_SID");
+        $token = getenv("TWILIO_AUTH_TOKEN");
+        $twilio = new Client($sid, $token);
+
+        $messages = $twilio->messages->read(
+            [
+                "dateSentBefore" => new \DateTime($dateSentBefore . "T00:00:00Z"),
+                "dateSentAfter" => new \DateTime($dateSentAfter . "T00:00:00Z")
+            ],
+            20
+        );
+
+        foreach ($messages as $record) {
+            print $record->body;
+        }
     }
 }

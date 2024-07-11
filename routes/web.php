@@ -21,6 +21,9 @@ $router->get('/create/conversation/twilio', 'TwlioController@createConversation'
 $router->get('/fetch/conversation/twilio', 'TwlioController@fetchYourNewConversation');
 $router->get('/add/participant/twilio', 'TwlioController@addAnSmsParticipantToAConversation');
 $router->get('/add/participant/chat/twilio', 'TwlioController@addAChatParticipantToAConversation');
-$router->get('/send/sms/twilio', 'TwlioController@sendAnSms');
+$router->post('/send/sms/twilio', 'TwlioController@sendAnSms');
 $router->get('/list/all/sms/twilio', 'TwlioController@listAllMessageResources');
 $router->get('/fetch/sms/twilio', 'TwlioController@fetchAMessage');
+$router->get('/list/sms/criteria/twilio', 'TwlioController@listMessageResourcesMatchingFilterCriteria');
+$router->get('/list/sms/before/specific/date/twilio', 'TwlioController@listMessagesThatWereSentBeforeSpecificDate');
+$router->get('/list/sms/before/specific/time/period/twilio', 'TwlioController@listMessagesWithinSpecificTimePeriod');
