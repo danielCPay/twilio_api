@@ -30,7 +30,7 @@ class TwlioController extends Controller
         $twilio = new Client($sid, $token);
 
         $conversation = $twilio->conversations->v1->conversations->create([
-            "friendlyName" => "My First Conversation",
+            "friendlyName" => "My Test Conversation",
         ]);
 
         print $conversation->sid;
@@ -44,7 +44,7 @@ class TwlioController extends Controller
         $twilio = new Client($sid, $token);
 
         $conversation = $twilio->conversations->v1
-            ->conversations("CH0f99d9c32d2944c7a9b3a814b116d502")
+            ->conversations("CHbcf3d430cb084d76a62656481cd8c61a")
             ->fetch();
 
         print $conversation->chatServiceSid;
@@ -58,11 +58,11 @@ class TwlioController extends Controller
         $twilio = new Client($sid, $token);
 
         $participant = $twilio->conversations->v1
-            ->conversations("CH0f99d9c32d2944c7a9b3a814b116d502")
+            ->conversations("CHbcf3d430cb084d76a62656481cd8c61a")
             ->participants->create([
-                "messagingBindingAddress" => "+51951442655",
+                "messagingBindingAddress" => "+17869392966",
                 "messagingBindingProxyAddress" =>
-                getenv("TWILIO_MY_NUMBER"),
+                "+17863966813",
             ]);
 
         print $participant->sid;
@@ -77,31 +77,57 @@ class TwlioController extends Controller
         $twilio = new Client($sid, $token);
 
         $participant = $twilio->conversations->v1
-            ->conversations("CH0f99d9c32d2944c7a9b3a814b116d502")
-            ->participants->create(["identity" => "testDeveloper"]);
+            ->conversations("CHbcf3d430cb084d76a62656481cd8c61a")
+            ->participants->create(["identity" => "testConversation"]);
 
         print $participant->sid;
     }
 
+    public function createConversationMessage()
+    {
+        $sid = getenv("TWILIO_ACCOUNT_SID");
+        $token = getenv("TWILIO_AUTH_TOKEN");
+        $twilio = new Client($sid, $token);
+
+        $message = $twilio->conversations->v1
+            ->conversations("CHbcf3d430cb084d76a62656481cd8c61a")
+            ->messages->create([
+                "author" => "testConversation",
+                "body" => "Hello!",
+            ]);
+
+        print $message->sid;
+    }
+    public function listAllConversationMessages()
+    {
+
+        $sid = getenv("TWILIO_ACCOUNT_SID");
+        $token = getenv("TWILIO_AUTH_TOKEN");
+        $twilio = new Client($sid, $token);
+
+        $messages = $twilio->conversations->v1
+            ->conversations("CHbcf3d430cb084d76a62656481cd8c61a")
+            ->messages->read([], 50);
+
+        foreach ($messages as $record) {
+            var_dump("Author: " . $record->author . " BodySms: " . $record->body
+                . " SID: " . $record->sid);
+        }     
+    }
+
     # SMS SEND API
     public function sendAnSms(Request $request)
-    {
+    {       
         $datos = (array)$request->input();
         $recipients = $datos['recipients'];
         $body_sms = $datos['body_sms'];
-        // Your Account SID and Auth Token from twilio.com/console
-        // To set up environmental variables, see http://twil.io/secure
+
         $account_sid = getenv('TWILIO_ACCOUNT_SID');
         $auth_token = getenv('TWILIO_AUTH_TOKEN');
-        // In production, these should be environment variables. E.g.:
-        // $auth_token = $_ENV["TWILIO_AUTH_TOKEN"]
-
-        // A Twilio number you own with SMS capabilities
         $twilio_number = getenv("TWILIO_MY_NUMBER");
 
         $client = new Client($account_sid, $auth_token);
         $client->messages->create(
-            // Where to send a text message (your cell phone?)
             '+51' . $recipients,
             array(
                 'from' => $twilio_number,
@@ -118,11 +144,15 @@ class TwlioController extends Controller
         $twilio = new Client($sid, $token);
 
         $messages = $twilio->messages->read([], 20);
+        $array_messsages = [];
 
         foreach ($messages as $record) {
             # print $record->sid;
-            var_dump($record->body);
+            # var_dump($record->body);
+            $array_messsages[] = array("messages" => $record->body);
         }
+
+        var_dump($array_messsages);
     }
     public function fetchAMessage()
     {

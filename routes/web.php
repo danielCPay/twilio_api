@@ -16,11 +16,14 @@
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
-
+//////API CONVERSATIONS///////////////
 $router->get('/create/conversation/twilio', 'TwlioController@createConversation');
 $router->get('/fetch/conversation/twilio', 'TwlioController@fetchYourNewConversation');
 $router->get('/add/participant/twilio', 'TwlioController@addAnSmsParticipantToAConversation');
 $router->get('/add/participant/chat/twilio', 'TwlioController@addAChatParticipantToAConversation');
+$router->get('/list//all/conversation/twilio', 'TwlioController@listAllConversationMessages');
+$router->post('/create/conversation/message/twilio', 'TwlioController@createConversationMessage');
+////////API SEND SMS///// 
 $router->post('/send/sms/twilio', 'TwlioController@sendAnSms');
 $router->get('/list/all/sms/twilio', 'TwlioController@listAllMessageResources');
 $router->get('/fetch/sms/twilio', 'TwlioController@fetchAMessage');
